@@ -1,0 +1,42 @@
+frameworkVersion: "3"
+service: discord-slash-command
+provider:
+  name: aws
+  runtime: python3.9
+  region: ap-northeast-1
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - lambda:InvokeFunction
+            - lambda:InvokeAsync
+          Resource: "*"
+  environment:
+    SERVERLESS_STAGE: ${opt:stage, 'dev'}
+    BOT_ACCESS_TOKEN: ${env:BOT_ACCESS_TOKEN}
+    APPLICATION_ID: ${env:APPLICATION_ID}
+
+functions:
+  app:
+    handler: app.lambda_handler
+    events:
+      - httpApi:
+          path: /
+          method: post
+
+package:
+  patterns:
+    - "!.venv/**"
+    - "!node_modules/**"
+    - "!.idea/**"
+
+# プラグインを使って依存ライブラリを zip 圧縮します
+plugins:
+  - serverless-python-requirements
+custom:
+  pythonRequirements:
+    zip: true
+    slim: false
+    useDownloadCache: false
+    useStaticCache: false

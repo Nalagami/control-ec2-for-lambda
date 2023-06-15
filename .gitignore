@@ -1,0 +1,11 @@
+node_modules
+
+# serverless framework
+.serverless
+.requirements
+.requirements.zip
+
+# pyenv
+env
+
+# 
