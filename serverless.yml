@@ -40,3 +40,4 @@ custom:
     slim: false
     useDownloadCache: false
     useStaticCache: false
+    dockerizePip: true

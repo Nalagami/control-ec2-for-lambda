@@ -1,3 +1,8 @@
+try:
+    import unzip_requirements
+except ImportError:
+    pass
+
 import json
 
 # from aws-lambda import (APIGatewayProxyEventV2, APIGatewayProxyResultV2 )
