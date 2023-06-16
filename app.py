@@ -5,6 +5,8 @@ except ImportError:
 
 import json
 
+import boto3
+
 # from aws-lambda import (APIGatewayProxyEventV2, APIGatewayProxyResultV2 )
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
@@ -35,15 +37,22 @@ def lambda_handler(event: dict, context: dict):
             return {"type": 1}  # InteractionResponseType.Pong
         elif req["type"] == 2:  # InteractionType.ApplicationCommand
             # command options list -> dict
-            opts = (
-                {v["name"]: v["value"] for v in req["data"]["options"]}
-                if "options" in req["data"]
-                else {}
-            )
+            # opts = (
+            #     {v["name"]: v["value"] for v in req["data"]["options"]}
+            #     if "options" in req["data"]
+            #     else {}
+            # )
+            print(req)
+            action = req["data"]["options"][0]["value"]
+            username = req["member"]["user"]["username"]
 
-            text = "Hello!"
-        if "user" in opts:
-            text = f"Hello, <@{opts['user']}>!"
+            if action == "start":
+                boto3.client("lambda").invoke(
+                    FunctionName="startAndStopEc2", InvocationType="Event"
+                )
+                text = "hi " + username + ", server will start in a minute."
+            else:
+                text = "Hello!"
 
         return {
             "type": 4,  # InteractionResponseType.ChannelMessageWithSource
