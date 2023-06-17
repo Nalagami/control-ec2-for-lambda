@@ -52,7 +52,6 @@ plugins:
 custom:
   pythonRequirements:
     zip: true
-    slim: false
+    slim: true
     useDownloadCache: false
     useStaticCache: false
-    dockerizePip: true

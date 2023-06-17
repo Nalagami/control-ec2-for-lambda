@@ -1,5 +1,12 @@
+try:
+    import unzip_requirements
+except ImportError:
+    pass
+
 import os
 import time
+import json
+import requests
 import boto3
 
 
@@ -8,15 +15,33 @@ def lambda_handler(event, context):
 
     instance_id = os.environ["INSTANCE_ID"]
 
-    start_ec2(instance_id)
+    result = start_ec2(instance_id)
+
+    application_id = event["DISCORD_APP_ID"]
+    interaction_token = event["token"]
+    message = {}
+    if result == 1:
+        message = {"content": "ec2 already starting!"}
+    else:
+        message = {"content": "ec2 starting!"}
+    payload = json.dumps(message)
+    r = requests.post(
+        url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+        },
+    )
+
+    print(r.text)
 
     print("[FINISH] Finished runnning script")
 
-    return
+    return r.status_code
 
 
 # TODO: 起動後、メッセージ書き換えとIPアドレスを表示するように変更
-def start_ec2(instance_id: str) -> None:
+def start_ec2(instance_id: str):
     try:
         print("[INFO] Starting Instance: " + str(instance_id))
         region = os.environ["AWS_REGION"]
@@ -32,6 +57,7 @@ def start_ec2(instance_id: str) -> None:
             == "running"
         ):
             print("[INFO] Instance is already running: " + str(instance_id))
+            return 1
         else:
             print(
                 "[INFO] Instance was not running so called to start: "
@@ -64,6 +90,7 @@ def start_ec2(instance_id: str) -> None:
                 else:
                     time.sleep(10)
                     total += 10
+            return 0
 
     except Exception as error:
         print("[ERROR]" + str(error))

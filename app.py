@@ -3,6 +3,7 @@ try:
 except ImportError:
     pass
 
+import os
 import json
 import boto3
 
@@ -17,9 +18,9 @@ verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 def lambda_handler(event: dict, context: dict):
     try:
         headers: dict = {k.lower(): v for k, v in event["headers"].items()}
-        rawBody: str = event["body"]
-        signature = headers.get("x-signature-ed25519", "")
-        timestamp = headers.get("x-signature-timestamp", "")
+        rawBody: str = event.get("body", "")
+        signature: str = headers.get("x-signature-ed25519", "")
+        timestamp: str = headers.get("x-signature-timestamp", "")
 
         # validate the interaction
         if not verify(signature, timestamp, rawBody):
@@ -48,11 +49,19 @@ def lambda_handler(event: dict, context: dict):
 
             # TODO: 起動処理を非同期で実施.起動中メッセージを返す
             if action == "start":
+                token = req.get("token", "")
+                parameter = {
+                    "token": token,
+                    "DISCORD_APP_ID": os.environ["APPLICATION_ID"],
+                }
+                payload = json.dumps(parameter)
                 boto3.client("lambda").invoke(
                     FunctionName="discord-slash-command-dev-minecraft-ec2-start",
                     InvocationType="Event",
+                    Payload=payload,
                 )
-                text = "hi " + username + ", server will start in a minute."
+                # async_ec2_start()
+                text = "hi " + username + ", server starting up …"
             else:
                 text = "Hello!"
 
@@ -77,6 +86,13 @@ def verify(signature: str, timestamp: str, body: str) -> bool:
         return False
 
     return True
+
+
+async def async_ec2_start() -> None:
+    return await boto3.client("lambda").invoke(
+        FunctionName="discord-slash-command-dev-minecraft-ec2-start",
+        InvocationType="Event",
+    )
 
 
 def command_handler(body):

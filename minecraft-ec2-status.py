@@ -1,4 +1,9 @@
-import json
+try:
+    import unzip_requirements
+except ImportError:
+    pass
+
+mport json
 import os
 import time
 
