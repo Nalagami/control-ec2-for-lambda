@@ -12,10 +12,19 @@ provider:
             - lambda:InvokeFunction
             - lambda:InvokeAsync
           Resource: "*"
+        - Effect: Allow
+          Action:
+            - ec2:DescribeInstances
+            - ec2:DescribeInstanceStatus
+            - ec2:StopInstances
+            - ec2:StartInstances
+          Resource: "*"
+
   environment:
     SERVERLESS_STAGE: ${opt:stage, 'dev'}
     BOT_ACCESS_TOKEN: ${env:BOT_ACCESS_TOKEN}
     APPLICATION_ID: ${env:APPLICATION_ID}
+    INSTANCE_ID: ${env:INSTANCE_ID}
 
 functions:
   app:
@@ -24,6 +33,12 @@ functions:
       - httpApi:
           path: /
           method: post
+  minecraft-ec2-start:
+    handler: minecraft-ec2-start.lambda_handler
+  minecraft-ec2-stop:
+    handler: minecraft-ec2-stop.lambda_handler
+  minecraft-ec2-status:
+    handler: minecraft-ec2-status.lambda_handler
 
 package:
   patterns:

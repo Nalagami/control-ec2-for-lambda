@@ -4,7 +4,6 @@ except ImportError:
     pass
 
 import json
-
 import boto3
 
 # from aws-lambda import (APIGatewayProxyEventV2, APIGatewayProxyResultV2 )
@@ -21,6 +20,7 @@ def lambda_handler(event: dict, context: dict):
         rawBody: str = event["body"]
         signature = headers.get("x-signature-ed25519", "")
         timestamp = headers.get("x-signature-timestamp", "")
+
         # validate the interaction
         if not verify(signature, timestamp, rawBody):
             return {
@@ -46,9 +46,11 @@ def lambda_handler(event: dict, context: dict):
             action = req["data"]["options"][0]["value"]
             username = req["member"]["user"]["username"]
 
+            # TODO: 起動処理を非同期で実施.起動中メッセージを返す
             if action == "start":
                 boto3.client("lambda").invoke(
-                    FunctionName="startAndStopEc2", InvocationType="Event"
+                    FunctionName="discord-slash-command-dev-minecraft-ec2-start",
+                    InvocationType="Event",
                 )
                 text = "hi " + username + ", server will start in a minute."
             else:
@@ -59,8 +61,9 @@ def lambda_handler(event: dict, context: dict):
             "data": {"content": text},
         }
 
-    except:
-        raise
+    except Exception as e:
+        print("[ERROR]" + str(e))
+        return e
 
 
 def verify(signature: str, timestamp: str, body: str) -> bool:
@@ -68,6 +71,7 @@ def verify(signature: str, timestamp: str, body: str) -> bool:
         verify_key.verify(
             f"{timestamp}{body}".encode(), bytes.fromhex(signature)
         )
+
     except Exception as e:
         print(f"failed to verify request: {e}")
         return False

@@ -17,6 +17,7 @@ def lambda_handler(event, context):
     return
 
 
+# TODO: status checkに書き換える
 def start_ec2(instance_id: str) -> None:
     try:
         print("[INFO] Starting Instance: " + str(instance_id))
