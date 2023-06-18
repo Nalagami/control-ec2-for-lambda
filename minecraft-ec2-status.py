@@ -3,9 +3,9 @@ try:
 except ImportError:
     pass
 
-mport json
+import json
 import os
-import time
+import requests
 
 import boto3
 
@@ -15,17 +15,33 @@ def lambda_handler(event, context):
 
     instance_id = os.environ["INSTANCE_ID"]
 
-    start_ec2(instance_id)
+    result = status_ec2(instance_id)
+
+    application_id = event["DISCORD_APP_ID"]
+    interaction_token = event["token"]
+    message = {}
+    if result == 1:
+        message = {"content": "ec2 stopping!"}
+    elif result == 0:
+        message = {"content": "ec2 starting!"}
+    else:
+        message = {"content": "error!"}
+    payload = json.dumps(message)
+    r = requests.post(
+        url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+        },
+    )
 
     print("[FINISH] Finished runnning script")
 
     return
 
 
-# TODO: status checkに書き換える
-def start_ec2(instance_id: str) -> None:
+def status_ec2(instance_id: str) -> None:
     try:
-        print("[INFO] Starting Instance: " + str(instance_id))
         region = os.environ["AWS_REGION"]
         ec2_client = boto3.client("ec2", region_name=region)
         ec2_resource = boto3.resource("ec2").Instance(instance_id)
@@ -38,40 +54,20 @@ def start_ec2(instance_id: str) -> None:
             status_response["Reservations"][0]["Instances"][0]["State"]["Name"]
             == "running"
         ):
-            print("[INFO] Instance is already running: " + str(instance_id))
+            print("[INFO] Instance is running: " + str(instance_id))
+            return 0
+        elif (
+            status_response["Reservations"][0]["Instances"][0]["State"]["Name"]
+            == "stopping"
+            or status_response["Reservations"][0]["Instances"][0]["State"][
+                "Name"
+            ]
+            == "stopped"
+        ):
+            print("[INFO] Instance is stoppping: " + str(instance_id))
+            return 1
         else:
-            print(
-                "[INFO] Instance was not running so called to start: "
-                + str(instance_id)
-            )
-            response = ec2_client.start_instances(InstanceIds=[instance_id])
-            print(response)
-            ec2_resource.wait_until_running()
-            print(
-                "[INFO] Waiting for Instance to be ready: " + str(instance_id)
-            )
-            cont = True
-            total = 0
-
-            while cont:
-                status_response = ec2_client.describe_instance_status(
-                    InstanceIds=[instance_id]
-                )
-                print(status_response)
-                if (
-                    status_response["InstanceStatuses"][0]["InstanceStatus"][
-                        "Status"
-                    ]
-                    == "ok"
-                    and status_response["InstanceStatuses"][0]["SystemStatus"][
-                        "Status"
-                    ]
-                    == "ok"
-                ):
-                    cont = False
-                else:
-                    time.sleep(10)
-                    total += 10
+            print("[ERROR]Instance status unexpected")
 
     except Exception as error:
         print("[ERROR]" + str(error))

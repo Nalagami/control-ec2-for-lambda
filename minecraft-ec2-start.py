@@ -20,10 +20,14 @@ def lambda_handler(event, context):
     application_id = event["DISCORD_APP_ID"]
     interaction_token = event["token"]
     message = {}
-    if result == 1:
-        message = {"content": "ec2 already starting!"}
+    if result.get("status") == 1:
+        message = {
+            "content": f'ec2 already starting!\nIP:{result.get("ip","")}'
+        }
+    elif result.get("status") == 0:
+        message = {"content": f'ec2 starting!\nIP:{result.get("ip","")}'}
     else:
-        message = {"content": "ec2 starting!"}
+        message = {"content": "error!"}
     payload = json.dumps(message)
     r = requests.post(
         url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
@@ -40,8 +44,7 @@ def lambda_handler(event, context):
     return r.status_code
 
 
-# TODO: 起動後、メッセージ書き換えとIPアドレスを表示するように変更
-def start_ec2(instance_id: str):
+def start_ec2(instance_id: str) -> dict:
     try:
         print("[INFO] Starting Instance: " + str(instance_id))
         region = os.environ["AWS_REGION"]
@@ -57,7 +60,7 @@ def start_ec2(instance_id: str):
             == "running"
         ):
             print("[INFO] Instance is already running: " + str(instance_id))
-            return 1
+            return {"status": 1, "ip": ec2_resource.public_ip_address}
         else:
             print(
                 "[INFO] Instance was not running so called to start: "
@@ -90,7 +93,7 @@ def start_ec2(instance_id: str):
                 else:
                     time.sleep(10)
                     total += 10
-            return 0
+            return {"status": 0, "ip": ec2_resource.public_ip_address}
 
     except Exception as error:
         print("[ERROR]" + str(error))

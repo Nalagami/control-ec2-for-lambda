@@ -4,6 +4,8 @@ except ImportError:
     pass
 
 import os
+import json
+import requests
 import boto3
 
 
@@ -13,6 +15,20 @@ def lambda_handler(event, context):
     instance_id = os.environ["INSTANCE_ID"]
 
     stop_ec2_instances(instance_id)
+
+    application_id = event["DISCORD_APP_ID"]
+    interaction_token = event["token"]
+
+    message = {"content": "ec2 stopping!"}
+
+    payload = json.dumps(message)
+    r = requests.post(
+        url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
+        data=payload,
+        headers={
+            "Content-Type": "application/json",
+        },
+    )
 
     print("[FINISH] Finished stopping script")
 

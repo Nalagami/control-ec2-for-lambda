@@ -47,7 +47,6 @@ def lambda_handler(event: dict, context: dict):
             action = req["data"]["options"][0]["value"]
             username = req["member"]["user"]["username"]
 
-            # TODO: 起動処理を非同期で実施.起動中メッセージを返す
             if action == "start":
                 token = req.get("token", "")
                 parameter = {
@@ -62,6 +61,32 @@ def lambda_handler(event: dict, context: dict):
                 )
                 # async_ec2_start()
                 text = "hi " + username + ", server starting up …"
+            elif action == "stop":
+                token = req.get("token", "")
+                parameter = {
+                    "token": token,
+                    "DISCORD_APP_ID": os.environ["APPLICATION_ID"],
+                }
+                payload = json.dumps(parameter)
+                boto3.client("lambda").invoke(
+                    FunctionName="discord-slash-command-dev-minecraft-ec2-stop",
+                    InvocationType="Event",
+                    Payload=payload,
+                )
+                text = "hi " + username + ", server stopping …"
+            elif action == "status":
+                token = req.get("token", "")
+                parameter = {
+                    "token": token,
+                    "DISCORD_APP_ID": os.environ["APPLICATION_ID"],
+                }
+                payload = json.dumps(parameter)
+                boto3.client("lambda").invoke(
+                    FunctionName="discord-slash-command-dev-minecraft-ec2-status",
+                    InvocationType="Event",
+                    Payload=payload,
+                )
+                text = "scanning…"
             else:
                 text = "Hello!"
 
