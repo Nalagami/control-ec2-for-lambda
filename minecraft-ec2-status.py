@@ -40,6 +40,8 @@ def lambda_handler(event, context):
     return
 
 
+# TODO: statusにスタンプ(green, redなど)をつけてメッセージを送信する
+# TODO: 起動時はIPアドレスを返す
 def status_ec2(instance_id: str) -> None:
     try:
         region = os.environ["AWS_REGION"]

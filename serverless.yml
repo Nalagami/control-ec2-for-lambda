@@ -25,6 +25,7 @@ provider:
     BOT_ACCESS_TOKEN: ${env:BOT_ACCESS_TOKEN}
     APPLICATION_ID: ${env:APPLICATION_ID}
     INSTANCE_ID: ${env:INSTANCE_ID}
+    PUBLIC_KEY: ${env:PUBLIC_KEY}
 
 functions:
   app:
