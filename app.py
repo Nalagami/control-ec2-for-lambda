@@ -11,6 +11,7 @@ import boto3
 from nacl.signing import VerifyKey
 from nacl.exceptions import BadSignatureError
 
+# TODO: 公開鍵を環境変数から呼び出す
 PUBLIC_KEY = ""
 verify_key = VerifyKey(bytes.fromhex(PUBLIC_KEY))
 

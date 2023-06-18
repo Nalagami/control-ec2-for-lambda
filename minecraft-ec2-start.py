@@ -20,6 +20,8 @@ def lambda_handler(event, context):
     application_id = event["DISCORD_APP_ID"]
     interaction_token = event["token"]
     message = {}
+
+    # TODO: 起動時でもalreadyに分岐されるバグを修正
     if result.get("status") == 1:
         message = {
             "content": f'ec2 already starting!\nIP:{result.get("ip","")}'
@@ -29,6 +31,7 @@ def lambda_handler(event, context):
     else:
         message = {"content": "error!"}
     payload = json.dumps(message)
+    # TODO:discordのwebhook処理を共通化(引数:application_id, iteraction_token, message(str))
     r = requests.post(
         url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
         data=payload,
