@@ -21,11 +21,11 @@ def lambda_handler(event, context):
     interaction_token = event["token"]
     message = {}
     if result == 1:
-        message = {"content": "ec2 stopping!"}
+        message = {"content": ":yellow_circle: ec2 stopping!"}
     elif result == 0:
-        message = {"content": "ec2 starting!"}
+        message = {"content": ":green_circle: ec2 starting!"}
     else:
-        message = {"content": "error!"}
+        message = {"content": ":red_circle: error!"}
     payload = json.dumps(message)
     r = requests.post(
         url=f"https://discord.com/api/v10/webhooks/{application_id}/{interaction_token}",
