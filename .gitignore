@@ -12,3 +12,7 @@ node_modules
 *.id_rsa
 *terraform.*
 .terraform
+
+python
+
+*.zip*
