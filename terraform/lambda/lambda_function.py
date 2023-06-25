@@ -1,1 +1,1 @@
-print("Hello terraform lambda!")
+print("hogehoge")
