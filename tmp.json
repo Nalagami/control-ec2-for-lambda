@@ -1,0 +1,34 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "Service": "lambda.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        },
+        {
+            "Action": [
+                "lambda:InvokeAsync",
+                "lambda:InvokeFunction"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ]
+        },
+        {
+            "Action": [
+                "ec2:DescribeInstanceStatus",
+                "ec2:DescribeInstances",
+                "ec2:StartInstances",
+                "ec2:StopInstances"
+            ],
+            "Effect": "Allow",
+            "Resource": [
+                "*"
+            ]
+        }
+    ]
+}
