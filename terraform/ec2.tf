@@ -35,7 +35,7 @@ resource "aws_instance" "handson_ec2" {
   associate_public_ip_address = "true"
   key_name                    = var.key_name
 
-  # TODO:minecraft起動スクリプトを修正する
+  # TODO:systemdでminecraftを起動する用に変更
   user_data = <<EOF
   #!/bin/bash
   yum install -y https://corretto.aws/downloads/latest/amazon-corretto-17-x64-al2-jre.rpm

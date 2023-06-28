@@ -54,8 +54,9 @@ def lambda_handler(event: dict, context: dict):
                     "DISCORD_APP_ID": os.environ["APPLICATION_ID"],
                 }
                 payload = json.dumps(parameter)
+                # TODO: function nameを変数化
                 boto3.client("lambda").invoke(
-                    FunctionName="discord-slash-command-dev-minecraft-ec2-start",
+                    FunctionName="slashcommand-minecraft-ec2-start",
                     InvocationType="Event",
                     Payload=payload,
                 )
@@ -69,7 +70,7 @@ def lambda_handler(event: dict, context: dict):
                 }
                 payload = json.dumps(parameter)
                 boto3.client("lambda").invoke(
-                    FunctionName="discord-slash-command-dev-minecraft-ec2-stop",
+                    FunctionName="slashcommand-minecraft-ec2-stop",
                     InvocationType="Event",
                     Payload=payload,
                 )
@@ -82,7 +83,7 @@ def lambda_handler(event: dict, context: dict):
                 }
                 payload = json.dumps(parameter)
                 boto3.client("lambda").invoke(
-                    FunctionName="discord-slash-command-dev-minecraft-ec2-status",
+                    FunctionName="slashcommand-minecraft-ec2-status",
                     InvocationType="Event",
                     Payload=payload,
                 )

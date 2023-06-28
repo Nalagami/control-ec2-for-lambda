@@ -215,9 +215,6 @@ variable "BOT_ACCESS_TOKEN" {
 variable "APPLICATION_ID" {
   type = string
 }
-variable "INSTANCE_ID" {
-  type = string
-}
 variable "PUBLIC_KEY" {
   type = string
 }
@@ -244,7 +241,7 @@ resource "aws_lambda_function" "slashcommand_app" {
     variables = {
       BOT_ACCESS_TOKEN = var.BOT_ACCESS_TOKEN
       APPLICATION_ID   = var.APPLICATION_ID
-      INSTANCE_ID      = var.INSTANCE_ID
+      INSTANCE_ID      = aws_instance.handson_ec2.id
       PUBLIC_KEY       = var.PUBLIC_KEY
     }
   }
@@ -272,7 +269,7 @@ resource "aws_lambda_function" "slashcommand_minecraft_ec2_start" {
     variables = {
       BOT_ACCESS_TOKEN = var.BOT_ACCESS_TOKEN
       APPLICATION_ID   = var.APPLICATION_ID
-      INSTANCE_ID      = var.INSTANCE_ID
+      INSTANCE_ID      = aws_instance.handson_ec2.id
       PUBLIC_KEY       = var.PUBLIC_KEY
     }
   }
@@ -300,7 +297,7 @@ resource "aws_lambda_function" "slashcommand_minecraft_ec2_stop" {
     variables = {
       BOT_ACCESS_TOKEN = var.BOT_ACCESS_TOKEN
       APPLICATION_ID   = var.APPLICATION_ID
-      INSTANCE_ID      = var.INSTANCE_ID
+      INSTANCE_ID      = aws_instance.handson_ec2.id
       PUBLIC_KEY       = var.PUBLIC_KEY
     }
   }
@@ -328,7 +325,7 @@ resource "aws_lambda_function" "slashcommand_minecraft_ec2_status" {
     variables = {
       BOT_ACCESS_TOKEN = var.BOT_ACCESS_TOKEN
       APPLICATION_ID   = var.APPLICATION_ID
-      INSTANCE_ID      = var.INSTANCE_ID
+      INSTANCE_ID      = aws_instance.handson_ec2.id
       PUBLIC_KEY       = var.PUBLIC_KEY
     }
   }
