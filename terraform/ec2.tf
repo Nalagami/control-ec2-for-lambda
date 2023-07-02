@@ -8,8 +8,8 @@ resource "tls_private_key" "handson_private_key" {
 }
 
 locals {
-  public_key_file  = "C:\\Users\\Public\\aws-resource\\${var.key_name}.id_rsa.pub"
-  private_key_file = "C:\\Users\\Public\\aws-resource\\${var.key_name}.id_rsa"
+  public_key_file  = "${var.key_name}.id_rsa.pub"
+  private_key_file = "${var.key_name}.id_rsa"
 }
 
 resource "local_file" "handson_private_key_pem" {
@@ -35,18 +35,7 @@ resource "aws_instance" "handson_ec2" {
   associate_public_ip_address = "true"
   key_name                    = var.key_name
 
-  # TODO:systemdでminecraftを起動する用に変更
-  user_data = <<EOF
-  #!/bin/bash
-  yum install -y https://corretto.aws/downloads/latest/amazon-corretto-17-x64-al2-jre.rpm
-  mkdir /home/ec2-user/minecraft
-  cd /home/ec2-user/minecraft
-  wget https://piston-data.mojang.com/v1/objects/84194a2f286ef7c14ed7ce0090dba59902951553/server.jar
-  java -Xmx1024M -Xms1024M -jar server.jar nogui
-  wait
-  sed -i.bak -e 's/eula=false/eula=true/g' eula.txt
-  java -Xmx1024M -Xms1024M -jar server.jar nogui &
-  EOF
+  user_data = file("userdata.sh")
 
   tags = {
     Name = "terraform-handson-ec2"
